@@ -33,8 +33,8 @@ shinyUI(fluidPage(
                 value = 100000),
        
        radioButtons("equalOrDecreasing", label = "Equal/Decreasing Installments",
-                    choices = list("Equal" = 1, "Decreasing" = 2), 
-                    selected = 1),
+                    choices = list("Equal" = TRUE, "Decreasing" = FALSE), 
+                    selected = TRUE),
        
        radioButtons("variableOrFixed", label = "Interest rate",
                     choices = list("Variable" = 1, "Fixed" = 2), 
@@ -43,8 +43,9 @@ shinyUI(fluidPage(
        sliderInput("interestRate",
                    "Interest rate:",
                    min = 0,
-                   max = 15,
-                   value = 1.5,
+                   max = 10,
+                   value = 3,
+                   round = FALSE,
                    step = 0.25,
                    post = " %"),
        
@@ -73,7 +74,15 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
       navbarPage(title="", collapsible = TRUE,
-        tabPanel("Your mortgage details", "contents1"), 
+        tabPanel("Your mortgage details", 
+                 tabsetPanel(
+                   tabPanel("Values",
+                            fluidPage(
+                              fluidRow(
+                                column(12, h2("Some numbers", align="center"))),
+                                       fluidRow(
+                                         column(6, "Total Cost"),
+                                         column(width = 6, textOutput("contents1"))))))), 
         tabPanel("Sensitivity analysis", "contents2"), 
         tabPanel("Variable vs fixed rate", "contents3"),
         tabPanel("Equal vs decreasing installments", "contents4")
