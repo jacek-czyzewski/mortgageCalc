@@ -8,6 +8,11 @@
 #
 
 library(shiny)
+library(plotly)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+# library(flexdashboard)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -25,12 +30,7 @@ shinyUI(fluidPage(
                    step = 10000,
                    value = 500000),
        
-       sliderInput("downPayment",
-                "Down payment in PLN:",
-                min = 0,
-                max = 2000000,
-                step = 10000,
-                value = 100000),
+       uiOutput("uiDownPayment"),
        
        radioButtons("equalOrDecreasing", label = "Equal/Decreasing Installments",
                     choices = list("Equal" = TRUE, "Decreasing" = FALSE), 
@@ -59,7 +59,7 @@ shinyUI(fluidPage(
        
        sliderInput("loanTerm",
                    "Loan term in years:",
-                   min = 0,
+                   min = 1,
                    max = 30,
                    value = 15,
                    step = 1),
@@ -74,19 +74,25 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
       navbarPage(title="", collapsible = TRUE,
-        tabPanel("Your mortgage details", 
-                 tabsetPanel(
-                   tabPanel("Values",
+        tabPanel("Your mortgage details",
                             fluidPage(
                               fluidRow(
-                                column(12, h2("Some numbers", align="center"))),
-                                       fluidRow(
-                                         column(6, "Total Cost"),
-                                         column(width = 6, textOutput("contents1"))))))), 
-        tabPanel("Sensitivity analysis", "contents2"), 
-        tabPanel("Variable vs fixed rate", "contents3"),
-        tabPanel("Equal vs decreasing installments", "contents4")
+                                # Values should be put in ValueBox function from shinydashboard!
+                                column(12, h1("Your Mortgage Summary", align="center")),
+                              fluidRow(
+                                column(12, h3(textOutput("contents1"))),
+                                column(12, h3(textOutput("contents2"))),
+                                column(12, h3(textOutput("contents3")))),
+                              fluidRow(
+                                column(12, textOutput("XYZ")),
+                                column(12, plotOutput("barplot1")))
+                              ))),
+        tabPanel("Sensitivity analysis", plotOutput("testplot")),
+        tabPanel("Variable vs fixed rate", plotlyOutput("barplot2")),
+        tabPanel("Equal vs decreasing installments", plotlyOutput("barplot3"))
       )
     )
+
+    
   )
 ))
