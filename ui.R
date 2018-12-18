@@ -88,7 +88,7 @@ shinyUI(fluidPage(
                                 column(12, plotlyOutput("barplot2")))
                               ))),
         tabPanel("Sensitivity analysis", plotOutput("testplot")),
-        tabPanel("Your mortgage details", dataTableOutput("mortgageDetails")),
+        tabPanel("Your mortgage details", dataTableOutput("mortgageDetails"), downloadButton("dltab", "Download")),
         tabPanel("Variable vs fixed rate", plotOutput("barplot1")),
         tabPanel("Equal vs decreasing installments", plotlyOutput("barplot3"))
       )

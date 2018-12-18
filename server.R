@@ -125,7 +125,16 @@ shinyServer(function(input, output) {
     paste("Date of last payment:", as.Date(startDate() + loanTerm()*365))
   })
 
-  output$mortgageDetails <- renderDataTable(datatable(mortgageData()[[2]]))
+  mortgageDetailsData <- reactive({mortgageData()[[2]]})
+  output$mortgageDetails <- renderDataTable(datatable(mortgageDetailsData()) %>% formatRound(1:4, 2))
+  
+  output$dltab<-downloadHandler(
+    filename=function(){
+      paste("Mortgage-", Sys.Date(), ".csv", sep="")},
+    content=function(file){
+      write.csv(mortgageDetailsData(), file)
+    }
+  )
   
   testdata <- data.frame(x=1, y=1)
   
