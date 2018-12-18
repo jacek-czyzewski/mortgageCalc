@@ -12,6 +12,7 @@ library(plotly)
 library(ggplot2)
 library(reshape2)
 library(dplyr)
+library(DT)
 # library(flexdashboard)
 
 # Define UI for application that draws a histogram
@@ -74,7 +75,7 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
       navbarPage(title="", collapsible = TRUE,
-        tabPanel("Your mortgage details",
+        tabPanel("Summary",
                             fluidPage(
                               fluidRow(
                                 # Values should be put in ValueBox function from shinydashboard!
@@ -84,11 +85,11 @@ shinyUI(fluidPage(
                                 column(12, h3(textOutput("contents2"))),
                                 column(12, h3(textOutput("contents3")))),
                               fluidRow(
-                                column(12, textOutput("XYZ")),
-                                column(12, plotOutput("barplot1")))
+                                column(12, plotlyOutput("barplot2")))
                               ))),
         tabPanel("Sensitivity analysis", plotOutput("testplot")),
-        tabPanel("Variable vs fixed rate", plotlyOutput("barplot2")),
+        tabPanel("Your mortgage details", dataTableOutput("mortgageDetails")),
+        tabPanel("Variable vs fixed rate", plotOutput("barplot1")),
         tabPanel("Equal vs decreasing installments", plotlyOutput("barplot3"))
       )
     )
