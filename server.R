@@ -103,29 +103,22 @@ shinyServer(function(input, output) {
 # if(is.null(mortgageData())){return(NULL)}
 
   output$contents1 <- renderText({
-    paste("Total Cost:", format(mortgageData()[[1]], nsmall=2, big.mark=","), "PLN", sep=" ")
+    paste("Total Amount:", format(mortgageData()[[1]], nsmall=2, big.mark=","), "PLN", sep=" ")
   })
-  
-  # output$contents1 <- renderText({ 
-  #   paste("Total Cost:", format(mortgage2(P=propertyValue(), I=interestRate(), L=loanTerm(),
-  #                                  equal=equalOrDecreasing(), D=downPayment())[[1]], nsmall=2, big.mark=","), "PLN", sep=" ")
-  #   # mortgage3()[[1]]
-  # })
   
   output$contents2 <- renderText({ 
     paste("Total Interest:", format(sum(mortgageData()[[2]]$Annual_Interest), nsmall=2, big.mark=","), "PLN", sep=" ")
   })
   
-  # output$contents2 <- renderText({ 
-  #   paste("Total Interest:", format(sum(mortgage2(P=propertyValue(), I=interestRate(), L=loanTerm(),
-  #                                         equal=equalOrDecreasing(), D=downPayment())[[2]]$Annual_Interest), nsmall=2, big.mark=","), "PLN", sep=" ")
-  # })
-  
   output$contents3 <- renderText({
     paste("Date of last payment:", as.Date(startDate() + loanTerm()*365))
   })
 
-  mortgageDetailsData <- reactive({mortgageData()[[2]]})
+  output$contents4 <- renderText({
+    paste("Your first monthly payment:", format(mortgageData()[[3]]$Monthly_Payment[1], nsmall=2, big.mark=","), "PLN", sep=" ")
+  })
+  
+  mortgageDetailsData <- reactive({mortgageData()[[as.numeric(input$annualOrMonthly)]]})
   output$mortgageDetails <- renderDataTable(datatable(mortgageDetailsData()) %>% formatRound(1:4, 2))
   
   output$dltab<-downloadHandler(
@@ -136,32 +129,25 @@ shinyServer(function(input, output) {
     }
   )
   
-  testdata <- data.frame(x=1, y=1)
-  
-  output$testplot <- renderPlot(ggplot(testdata, aes(x=x, y=y)) + geom_point())
-  
-  output$barplot1 <- renderPlot({
-    # aDFyear <- mortgage2(P=propertyValue(), I=interestRate(), L=loanTerm(), equal=equalOrDecreasing(), D=downPayment())[[2]]
+  output$piechart <- renderPlotly({
     aDFyear <- mortgageData()[[2]]
-    barplot(t(aDFyear[,c(3,4)]), 
-            col=c("blue", "red"), 
-            main="Annual Interest and Principal Payments", 
-            xlab="Years", ylab="$ Amount", 
-            legend.text=c("Principal", "Interest"), 
-            ylim=c(0, max(aDFyear$Annual_Payment)*1.3))
-    
-  })
+    Interest <- sum(aDFyear$Annual_Interest)
+    Principal <- sum(aDFyear$Annual_Principal)
+    myValues <- c(Interest, Principal)
+    myLabels <- c("Total Interest", "Total Principal")
+    plot_ly(labels = ~myLabels, values = ~myValues, type = 'pie', textposition = 'inside', textinfo = 'label')
+})
   
   output$barplot2 <- renderPlotly({
-    # aDFyear <- mortgage2(P=propertyValue(), I=interestRate(), L=loanTerm(), equal=equalOrDecreasing(), D=downPayment())[[2]]
     aDFyear <- mortgageData()[[2]]
     aDFyear$Balance <- sum(aDFyear$Annual_Payment)-cumsum(aDFyear$Annual_Payment)
     df3 <- select(aDFyear, "Annual_Principal", "Annual_Interest", "Year")
     names(df3) <- c("Annual Principal", "Annual Interest", "Year")
     df3_melted <- as.data.frame.array(melt(df3, measure.vars = c("Annual Principal", "Annual Interest")))
     df3_melted$myText <- paste("Year: ", df3_melted$Year, "\n", "Value: ", format(round(df3_melted$value, 2), big.mark = " "), "\n", "Variable: ", df3_melted$variable)
-    barplot2 <- ggplot(df3_melted, aes(x=Year, y=value, fill=variable, text=myText)) + geom_bar(stat="identity") +
+    barplot2 <- ggplot(df3_melted, aes(x=as.factor(Year), y=value, fill=variable, text=myText)) + geom_bar(stat="identity") +
       ylab("Payment Value") +
+      xlab("Year") +
       scale_fill_discrete(
         name="Instalment\nComponents",
         breaks=c("Annual_Principal", "Annual_Interest"),
@@ -170,27 +156,6 @@ shinyServer(function(input, output) {
     barplotly2 <- ggplotly(barplot2, tooltip="text")
     layout(barplotly2, autosize=TRUE, margin = list(l=100, t=70))
   })
-  
-  output$barplot3 <- renderPlotly({
-    # aDFyear <- mortgage2(P=propertyValue(), I=interestRate(), L=loanTerm(), equal=equalOrDecreasing(), D=downPayment())[[2]]
-    aDFyear <- mortgageData()[[2]]
-    aDFyear$Balance <- sum(aDFyear$Annual_Payment)-cumsum(aDFyear$Annual_Payment)
-    df3 <- select(aDFyear, "Annual_Principal", "Annual_Interest", "Year")
-    names(df3) <- c("Annual Principal", "Annual Interest", "Year")
-    df3_melted <- as.data.frame.array(melt(df3, measure.vars = c("Annual Principal", "Annual Interest")))
-    barplot3 <- ggplot(df3_melted)  + geom_bar(aes(x=Year, y=value, fill=variable), stat="identity") + 
-      ylab("Payment Value") +
-      scale_fill_discrete(name="Instalment\nComponents",
-        breaks=c("Annual_Principal", "Annual_Interest"),
-        labels=c("Annual Principal", "Annual Interest")) + 
-      geom_line(data=aDFyear, aes(x=Year, y=Balance/max(Year)))+
-      # scale_color_manual(NULL, values = "black") +
-      scale_y_continuous(sec.axis = sec_axis(trans = ~ . * max(aDFyear$Year), name="Mortgage Balance Value"))
-
-    barplotly3 <- ggplotly(barplot3)
-    layout(barplotly3, autosize=TRUE, margin = list(l=100, t=70))
-  })
-  
  
 
     

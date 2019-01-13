@@ -83,14 +83,20 @@ shinyUI(fluidPage(
                               fluidRow(
                                 column(12, h3(textOutput("contents1"))),
                                 column(12, h3(textOutput("contents2"))),
+                                column(12, h3(textOutput("contents4"))),
                                 column(12, h3(textOutput("contents3")))),
                               fluidRow(
                                 column(12, plotlyOutput("barplot2")))
                               ))),
-        tabPanel("Sensitivity analysis", plotOutput("testplot")),
-        tabPanel("Your mortgage details", dataTableOutput("mortgageDetails"), downloadButton("dltab", "Download")),
-        tabPanel("Variable vs fixed rate", plotOutput("barplot1")),
-        tabPanel("Equal vs decreasing installments", plotlyOutput("barplot3"))
+        tabPanel("Your mortgage details", fluidPage(
+          fluidRow(
+            column(12,radioButtons("annualOrMonthly", label = "Annual or Monthly Data?",
+                                                       choices = list("Annual" = 2, "Monthly" = 3), 
+                                                       selected = 2)),
+            column(12, dataTableOutput("mortgageDetails")),
+            column(12, downloadButton("dltab", "Download"))))
+                 ),
+        tabPanel("Sensitivity analysis", plotlyOutput("piechart"))
       )
     )
 
