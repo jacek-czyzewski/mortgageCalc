@@ -86,17 +86,19 @@ shinyUI(fluidPage(
                                 column(12, h3(textOutput("contents4"))),
                                 column(12, h3(textOutput("contents3")))),
                               fluidRow(
-                                column(12, plotlyOutput("barplot2")))
+                                column(12, plotlyOutput("piechart")))
                               ))),
-        tabPanel("Your mortgage details", fluidPage(
-          fluidRow(
-            column(12,radioButtons("annualOrMonthly", label = "Annual or Monthly Data?",
+        tabPanel("Your mortgage data",
+                            fluidPage(
+                              fluidRow(
+                                column(12, radioButtons("annualOrMonthly", label = "Annual or Monthly Data?",
                                                        choices = list("Annual" = 2, "Monthly" = 3), 
                                                        selected = 2)),
-            column(12, dataTableOutput("mortgageDetails")),
-            column(12, downloadButton("dltab", "Download"))))
-                 ),
-        tabPanel("Sensitivity analysis", plotlyOutput("piechart"))
+                                column(12, dataTableOutput("mortgageDetails")),
+                                column(12, downloadButton("dltab", "Download"))
+                              ))),
+        tabPanel("Your mortgage details", plotlyOutput("barplot2")),
+        tabPanel("Sensitivity analysis")
       )
     )
 

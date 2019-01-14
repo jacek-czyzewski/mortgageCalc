@@ -38,6 +38,7 @@ shinyServer(function(input, output) {
     
     currP <- NULL
     if(equal==TRUE){
+      req(Pt)
       while(Pt>=0) {
         H <- Pt * J # this is the current monthly interest
         C <- M - H # this is your monthly payment minus your monthly interest, so it is the amount of principal you pay for that month
@@ -48,6 +49,7 @@ shinyServer(function(input, output) {
       monthP <- c(P-D, currP[1:(length(currP)-1)])-currP
     }else{
       i = 1
+      req(Pt)
       while(Pt>=0&&i<=N) {
         H <- Pt * J # this is the current monthly interest
         C <- M[i] - H # this is your monthly payment minus your monthly interest, so it is the amount of principal you pay for that month
@@ -103,7 +105,7 @@ shinyServer(function(input, output) {
 # if(is.null(mortgageData())){return(NULL)}
 
   output$contents1 <- renderText({
-    paste("Total Amount:", format(mortgageData()[[1]], nsmall=2, big.mark=","), "PLN", sep=" ")
+    paste("Total Amount:", format(mortgageData()[[1]], nsmall=2, digits = 2, big.mark=","), "PLN", sep=" ")
   })
   
   output$contents2 <- renderText({ 
@@ -115,7 +117,7 @@ shinyServer(function(input, output) {
   })
 
   output$contents4 <- renderText({
-    paste("Your first monthly payment:", format(mortgageData()[[3]]$Monthly_Payment[1], nsmall=2, big.mark=","), "PLN", sep=" ")
+    paste("Your first monthly payment:", format(mortgageData()[[3]]$Monthly_Payment[1], nsmall = 2, digits = 2, big.mark=","), "PLN", sep=" ")
   })
   
   mortgageDetailsData <- reactive({mortgageData()[[as.numeric(input$annualOrMonthly)]]})
